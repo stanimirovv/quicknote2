@@ -1,6 +1,7 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const express = require('express');
+const app = express();
+const port = 3000;
+const note = require('./lib/note');
 
 /*
  * IN: noteId
@@ -19,7 +20,7 @@ const port = 3000
 app.get('/n/:noteId', (req, res) => { 
   console.log(req.params);
   console.log(req.query.kakaka);
-  res.send('Hello World!')
+  res.send('Hello World!');
 });
 
 /*
@@ -30,7 +31,7 @@ app.get('/n/:noteId', (req, res) => {
  */
 app.get('/n/:noteId/auth', (req, res) => { 
   console.log(req.params);
-  res.send('Hello World!')
+  res.send('Hello World!');
 });
 
 /* IN: noteId
@@ -47,7 +48,7 @@ app.get('/n/:noteId/auth', (req, res) => {
  */
 app.post('/n/:noteId/auth', (req, res) => { 
   console.log(req.params);
-  res.send('Hello World!')
+  res.send('Hello World!');
 });
 
 /* IN: noteId
@@ -58,7 +59,7 @@ app.post('/n/:noteId/auth', (req, res) => {
  */
 app.post('/n/:noteId/save', (req, res) => { 
   console.log(req.params);
-  res.send('Hello World!')
+  res.send('Hello World!');
 });
 
 app.use('/public', express.static('public'));
