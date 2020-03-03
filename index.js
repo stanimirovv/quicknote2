@@ -1,8 +1,10 @@
 const express = require('express');
 const app = express();
+app.set('view engine', 'ejs');
 const port = 3000;
 const note = require('./lib/note');
-
+const pages = require('./lib/pages');
+pages.setApp(app);
 /*
  * IN: noteId
  * IN: authToken
@@ -17,10 +19,15 @@ const note = require('./lib/note');
  * OUT: create new note, session and load the UI. Prompt first save
  *
  */
-app.get('/n/:noteId', (req, res) => { 
-  console.log(req.params);
-  console.log(req.query.kakaka);
-  res.send('Hello World!');
+app.get('/n/:hash', (req, res) => {
+    console.log(req.params);
+    // console.log(req.query.kakaka);
+    let myNote = note.getNote(req.params.hash);
+    if (myNote === undefined) {
+        res.render('index', {encryptedContent: false, integrity: note.getIntegrityWord()});
+        return;
+    }
+    res.render('index', {encryptedContent: true, integrity: note.getIntegrityWord()});
 });
 
 /*
@@ -30,8 +37,8 @@ app.get('/n/:noteId', (req, res) => {
  * NOTE: opens up page with prompt to enter key; when ok is sent, the page sends request to
  */
 app.get('/n/:noteId/auth', (req, res) => { 
-  console.log(req.params);
-  res.send('Hello World!');
+    console.log(req.params);
+    res.send('Hello World!');
 });
 
 /* IN: noteId
@@ -47,8 +54,8 @@ app.get('/n/:noteId/auth', (req, res) => {
  * OUT: error message to display in the UI
  */
 app.post('/n/:noteId/auth', (req, res) => { 
-  console.log(req.params);
-  res.send('Hello World!');
+    console.log(req.params);
+    res.send('Hello World!');
 });
 
 /* IN: noteId
@@ -58,8 +65,8 @@ app.post('/n/:noteId/auth', (req, res) => {
  * ANY of the arguments wrong -> error msg for the client
  */
 app.post('/n/:noteId/save', (req, res) => { 
-  console.log(req.params);
-  res.send('Hello World!');
+    console.log(req.params);
+    res.send('Hello World!');
 });
 
 app.use('/public', express.static('public'));
