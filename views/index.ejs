@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>title</title>
+    <title>Quick Note 2</title>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script><!-- Header -->
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script><!-- Image -->
@@ -89,34 +89,37 @@
   <body>
       <div class="missionControl" >
           <button id='saveButton'>Save</button>
-          <input type="radio" id="autoSave" value="true">
-          <label for="autoSave">Auto Save</label><br>
       </div>
       <div id="editorjs" class="paper"></div>
   </body>
   <script>
-   // TODO save when no key
-   // TODO save with key
-   // TODO get existing
    // TODO move key, editor to global object ?
    var editor;
    var key;
    function init() {
-       let encryptedContent = <%- encryptedContent %>;
-       if (!encryptedContent) {
-           const defaultContent = {blocks: [{type: "header", data: {text: "Quick Note", level: 1}}, {type : "paragraph", data : {text : "Looks like a note with this hash doesn\'t exist so it is up for grabs. Make sure to save it to make sure that it is encrypted!"}}]};
-           loadEditor(defaultContent);
-       } else {
-           let txt;
+       let encryptedContent = '<%- encryptedContent %>';
+       let noteExists = <%= noteExists %>;
+       let errorMessage = <%= errorMessage %>;
+       if (errorMessage) {
+           alert('Error loading note, please try again later');
+           return;
+       }
+
+       if (noteExists) {
            loadEncryptionKeyIfNecessary();
-           // TODO Load from DB ?
-           /* const userContent = {blocks: [{type: "header", data: {text: "Custom, already existing content", level: 1}}]}; */
-           console.log(encryptedContent);
-           const userContent = sjcl.decrypt(key, encryptedContent);
-           loadEditor(userContent);
-           document.getElementById("demo").innerHTML = txt;
+           let userContent;
+           try {
+               userContent = sjcl.decrypt(key, encryptedContent);
+           } catch(error) {
+               alert('Decryption error.');
+           }
+           loadEditor(JSON.parse(userContent));
+       } else {
+           const defaultContent = [{type: "header", data: {text: "Quick Note", level: 1}}, {type : "paragraph", data : {text : "Looks like a note with this hash doesn\'t exist so it is up for grabs. Make sure to save it to make sure that it is encrypted!"}}];
+           loadEditor(defaultContent);
        }
    }
+
    init();
 
    function loadEncryptionKeyIfNecessary() {
@@ -126,7 +129,8 @@
    }
 
    function loadEditor(data) {
-       editor = new EditorJS({
+       console.log('data : ', data);
+       const editorData = {
            "time" : 1582807801650,
            "tools" : {
                header: {
@@ -194,16 +198,20 @@
                },
 
            },
-           data: data,
+           data: { blocks: data },
            "version": "2.16.1",
-       });
+       };
+       console.log(editorData.data);
+       editor = new EditorJS(editorData);
    }
 
    function saveNote() {
        editor.save().then( data => {
            console.log(data.blocks);
            loadEncryptionKeyIfNecessary();
-           const encryptedData = sjcl.encrypt(key, JSON.stringify(data.blocks));
+           /* let dataToSave = { blocks : data.blocks }; */
+           let dataToSave = data.blocks;
+           const encryptedData = sjcl.encrypt(key, JSON.stringify(dataToSave));
            const url = window.location.href + '/save'; //TODO keyword should be const
            fetch(url, {method: 'POST', redirect: 'follow', body: encryptedData, headers: {'Content-Type': 'application/json'}})
                .then((response) => {
