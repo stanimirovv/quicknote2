@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>title</title>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script><!-- Header -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script><!-- Image -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script><!-- Delimiter -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script><!-- List -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script><!-- Checklist -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script><!-- Quote -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script><!-- Code -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script><!-- Embed -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script><!-- Table -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@latest"></script><!-- Link -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/warning@latest"></script><!-- Warning -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/marker@latest"></script><!-- Marker -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest"></script><!-- Inline Code -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script><!-- Header -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script><!-- Image -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script><!-- Delimiter -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script><!-- List -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script><!-- Checklist -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script><!-- Quote -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script><!-- Code -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script><!-- Embed -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script><!-- Table -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@latest"></script><!-- Link -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/warning@latest"></script><!-- Warning -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/marker@latest"></script><!-- Marker -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest"></script><!-- Inline Code -->
+    <script src="/public/sjcl.js"></script>
+    <style>
+     .paper {
+         background: #fff;
+         padding: 30px;
+         position: relative;
+     }
+
+     .paper,
+     .paper::before,
+     .paper::after {
+         /* Styles to distinguish sheets from one another */
+         box-shadow: 1px 1px 1px rgba(0,0,0,0.25);
+         border: 1px solid #bbb;
+     }
+
+     .paper::before,
+     .paper::after {
+         content: "";
+         position: absolute;
+         height: 95%;
+         width: 99%;
+         background-color: #eee;
+     }
+
+     .paper::before {
+         right: 15px;
+         top: 0;
+         transform: rotate(-1deg);
+         z-index: -1;
+     }
+
+     .paper::after {
+         top: 5px;
+         right: -5px;
+         transform: rotate(1deg);
+         z-index: -2;
+     }
+
+     div.missionControl {
+         height: 2em;
+         position: relative;
+     }
+
+     div.missionControl button {
+         margin: 0;
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         margin-right: -50%;
+         transform: translate(-50%, -50%);
+     }
+    </style>
+  </head>
+  <body>
+      <div class="missionControl" >
+          <button id='saveButton'>Save</button>
+          <input type="radio" id="autoSave" value="true">
+          <label for="autoSave">Auto Save</label><br>
+      </div>
+      <div id="editorjs" class="paper"></div>
+  </body>
+  <script>
+   // TODO save when no key
+   // TODO save with key
+   // TODO get existing
+   // TODO move key, editor to global object ?
+   var editor;
+   var key;
+   function init() {
+       let encryptedContent = <%- encryptedContent %>;
+       if (!encryptedContent) {
+           const defaultContent = {blocks: [{type: "header", data: {text: "Quick Note", level: 1}}, {type : "paragraph", data : {text : "Looks like a note with this hash doesn\'t exist so it is up for grabs. Make sure to save it to make sure that it is encrypted!"}}]};
+           loadEditor(defaultContent);
+       } else {
+           let txt;
+           loadEncryptionKeyIfNecessary();
+           // TODO Load from DB ?
+           /* const userContent = {blocks: [{type: "header", data: {text: "Custom, already existing content", level: 1}}]}; */
+           console.log(encryptedContent);
+           const userContent = sjcl.decrypt(key, encryptedContent);
+           loadEditor(userContent);
+           document.getElementById("demo").innerHTML = txt;
+       }
+   }
+   init();
+
+   function loadEncryptionKeyIfNecessary() {
+       if (key == null || key == "") {
+           key = prompt("Please enter your key:");
+       }
+   }
+
+   function loadEditor(data) {
+       editor = new EditorJS({
+           "time" : 1582807801650,
+           "tools" : {
+               header: {
+                   class: Header,
+                   inlineToolbar: ['link'],
+                   config: {
+                       placeholder: 'Header'
+                   },
+                   shortcut: 'CMD+SHIFT+H'
+               },
+
+               image: {
+                   class: SimpleImage,
+                   inlineToolbar: ['link'],
+               },
+
+               list: {
+                   class: List,
+                   inlineToolbar: true,
+                   shortcut: 'CMD+SHIFT+L'
+               },
+
+               checklist: {
+                   class: Checklist,
+                   inlineToolbar: true,
+               },
+
+               quote: {
+                   class: Quote,
+                   inlineToolbar: true,
+                   config: {
+                       quotePlaceholder: 'Enter a quote',
+                       captionPlaceholder: 'Quote\'s author',
+                   },
+                   shortcut: 'CMD+SHIFT+O'
+               },
+
+               warning: Warning,
+
+               marker: {
+                   class:  Marker,
+                   shortcut: 'CMD+SHIFT+M'
+               },
+
+               code: {
+                   class:  CodeTool,
+                   shortcut: 'CMD+SHIFT+C'
+               },
+
+               delimiter: Delimiter,
+
+               inlineCode: {
+                   class: InlineCode,
+                   shortcut: 'CMD+SHIFT+C'
+               },
+
+               linkTool: LinkTool,
+
+               embed: Embed,
+
+               table: {
+                   class: Table,
+                   inlineToolbar: true,
+                   shortcut: 'CMD+ALT+T'
+               },
+
+           },
+           data: data,
+           "version": "2.16.1",
+       });
+   }
+
+   function saveNote() {
+       editor.save().then( data => {
+           console.log(data.blocks);
+           loadEncryptionKeyIfNecessary();
+           const encryptedData = sjcl.encrypt(key, JSON.stringify(data.blocks));
+           const url = window.location.href + '/save'; //TODO keyword should be const
+           fetch(url, {method: 'POST', redirect: 'follow', body: encryptedData, headers: {'Content-Type': 'application/json'}})
+               .then((response) => {
+                   return response.json();
+               })
+               .then((data) => {
+                   console.log(data);
+               });
+       });
+   }
+
+   document.getElementById("saveButton").addEventListener("click", saveNote);
+
+  </script>
+</html>
