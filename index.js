@@ -1,9 +1,12 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
-app.set('view engine', 'ejs');
 const port = 3000;
 const note = require('./lib/note');
 const pages = require('./lib/pages');
+
+app.set('view engine', 'ejs');
+app.use(bodyParser.json())
 pages.setApp(app);
 /*
  * IN: noteId
@@ -27,7 +30,7 @@ app.get('/n/:hash', (req, res) => {
         res.render('index', {encryptedContent: false, integrity: note.getIntegrityWord()});
         return;
     }
-    res.render('index', {encryptedContent: true, integrity: note.getIntegrityWord()});
+    res.render('index', {encryptedContent: myNote.body, integrity: note.getIntegrityWord()});
 });
 
 /*
@@ -36,7 +39,7 @@ app.get('/n/:hash', (req, res) => {
  * OUT: redirect to /n/:noteId with Auth
  * NOTE: opens up page with prompt to enter key; when ok is sent, the page sends request to
  */
-app.get('/n/:noteId/auth', (req, res) => { 
+app.get('/n/:hash/auth', (req, res) => { 
     console.log(req.params);
     res.send('Hello World!');
 });
@@ -53,7 +56,7 @@ app.get('/n/:noteId/auth', (req, res) => {
  * IN: encryped msg 'OK'
  * OUT: error message to display in the UI
  */
-app.post('/n/:noteId/auth', (req, res) => { 
+app.post('/n/:hash/auth', (req, res) => {
     console.log(req.params);
     res.send('Hello World!');
 });
@@ -64,9 +67,12 @@ app.post('/n/:noteId/auth', (req, res) => {
  *
  * ANY of the arguments wrong -> error msg for the client
  */
-app.post('/n/:noteId/save', (req, res) => { 
+app.post('/n/:hash/save', (req, res) => {
+    console.log(req.body);
     console.log(req.params);
-    res.send('Hello World!');
+    note.saveNote(req.params.hash, 'asd', req.body);
+
+    res.send('{"asd":123}');
 });
 
 app.use('/public', express.static('public'));
