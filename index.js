@@ -36,10 +36,10 @@ app.post('/n/:hash/save', (req, res) => {
     console.log(req.params);
     let status = note.saveNote(req.params.hash, req.body);
     if (status === null) {
-        res.send(JSON.serialize({"status" : "error"}));
+        res.send(JSON.stringify({"status" : "error"}));
     }
 
-    res.send(JSON.serialize({"status":"ok"}));
+    res.send(JSON.stringify({"status":"ok"}));
 });
 
 app.use('/public', express.static('public'));

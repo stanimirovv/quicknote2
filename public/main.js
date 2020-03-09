@@ -123,4 +123,3 @@ function saveNote() {
     });
 }
 
-document.getElementById("saveButton").addEventListener("click", saveNote);
