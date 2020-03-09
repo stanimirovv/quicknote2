@@ -9,6 +9,7 @@
   "author": "Zlatin Stanimirov",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^4.0.1",
     "better-sqlite3": "^6.0.1",
     "ejs": "^3.0.1",
     "express": "^4.17.1"
