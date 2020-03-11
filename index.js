@@ -32,11 +32,13 @@ app.get('/n/:hash', (req, res) => {
 });
 
 app.post('/n/:hash/save', (req, res) => {
+    // Format in the body is the one used by sjcl 
     console.log(req.body);
     console.log(req.params);
-    let status = note.saveNote(req.params.hash, req.body);
+    let status = note.saveNote(req.params.hash, req.body.salt, JSON.stringify(req.body));
     if (status === null) {
         res.send(JSON.stringify({"status" : "error"}));
+        return;
     }
 
     res.send(JSON.stringify({"status":"ok"}));
