@@ -1,3 +1,5 @@
+// TODO  move this to class/object for isolation
+// TODO default message should be from config ?
 var editor;
 var key;
 function init(encryptedContent, noteExists, errorMessage) {
@@ -112,7 +114,7 @@ function saveNote() {
         /* let dataToSave = { blocks : data.blocks }; */
         let dataToSave = data.blocks;
         const encryptedData = sjcl.encrypt(key, JSON.stringify(dataToSave));
-        const url = window.location.href + '/save'; //TODO keyword should be const
+        const url = window.location.href + '/save';
         fetch(url, {method: 'POST', redirect: 'follow', body: encryptedData, headers: {'Content-Type': 'application/json'}})
             .then((response) => {
                 return response.json();
